@@ -1,0 +1,126 @@
+version: '3.7'
+services:
+  elasticsearch1:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.6
+    container_name: elasticsearch1
+    environment:
+      - node.name=elasticsearch1
+      - cluster.name=docker-cluster
+      - discovery.seed_hosts=elasticsearch2,elasticsearch3
+      - cluster.initial_master_nodes=elasticsearch1,elasticsearch2,elasticsearch3
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      # - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - esdata1:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+
+  elasticsearch2:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.6
+    container_name: elasticsearch2
+    environment:
+      - node.name=elasticsearch2
+      - cluster.name=docker-cluster
+      - discovery.seed_hosts=elasticsearch1,elasticsearch3
+      - cluster.initial_master_nodes=elasticsearch1,elasticsearch2,elasticsearch3
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      # - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - esdata2:/usr/share/elasticsearch/data
+
+  elasticsearch3:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.6
+    container_name: elasticsearch3
+    environment:
+      - node.name=elasticsearch3
+      - cluster.name=docker-cluster
+      - discovery.seed_hosts=elasticsearch1,elasticsearch2
+      - cluster.initial_master_nodes=elasticsearch1,elasticsearch2,elasticsearch3
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      # - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - esdata3:/usr/share/elasticsearch/data
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    ports:
+      - "9090:9090"
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+
+  elasticsearch_exporter:
+    image: quay.io/prometheuscommunity/elasticsearch-exporter:v1.3.0 # latest v1.7.0
+    container_name: elasticsearch-exporter
+    command:
+      - '--es.uri=http://elasticsearch1:9200'
+    ports:
+      - "9114:9114"
+    depends_on:
+      - elasticsearch1
+
+  # elasticsearch-exporter:
+  #   image: justwatch/elasticsearch_exporter # v1.1.0 後停止更新
+  #   container_name: elasticsearch-exporter
+  #   environment:
+  #     - ES_URI=http://elasticsearch1:9200
+  #     - ES_ALL=true
+  #   ports:
+  #     - "9114:9114"
+  #   depends_on:
+  #     - elasticsearch1
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.17.6
+    container_name: kibana
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch1:9200
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch1
+
+  data-generator:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: data-generator
+    depends_on:
+      - elasticsearch1
+    volumes:
+      - ./generate_health_data.py:/usr/src/app/generate_health_data.py
+    restart: always  # 失敗後重啟
+
+volumes:
+  esdata1:
+    driver: local
+  esdata2:
+    driver: local
+  esdata3:
+    driver: local
