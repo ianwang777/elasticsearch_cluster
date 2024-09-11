@@ -76,10 +76,12 @@ services:
       - prometheus
 
   elasticsearch_exporter:
-    image: quay.io/prometheuscommunity/elasticsearch-exporter:v1.3.0 # latest v1.7.0
+    image: quay.io/prometheuscommunity/elasticsearch-exporter:v1.7.0 # v1.3.0, v1.7.0
     container_name: elasticsearch-exporter
     command:
       - '--es.uri=http://elasticsearch1:9200'
+      - '--collector.clustersettings' # post v1.6.0
+      # - '--es.cluster_settings' # pre v1.6.0
     ports:
       - "9114:9114"
     depends_on:
