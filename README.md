@@ -6,7 +6,8 @@
 
 - `docker-compose.yml`: Docker Compose 設定檔，包含 Elasticsearch cluster、Prometheus、Grafana 與自動生成資料的 Python container。
 - `Dockerfile`: 用來建立資料生成器的 Python container，會執行一個生成健康資料的 script。
-- `generate_health_data.py`: 一個 Python script，會定期生成隨機健康資料並寫入 Elasticsearch 中名為 health_info 的 index。
+- `generate_health_data.py`: 一個 Python script，會定時生成隨機健康資料並寫入 Elasticsearch 中名為 health_info 的 index。
+- `search_es.py`: 一個 Python script，會定時查詢 health_info 這個 index。
 - `prometheus.yml`: Prometheus 設定檔，負責從 Elasticsearch Exporter 中抓取監控數據。
 
 ## 系統需求
@@ -57,7 +58,7 @@ docker-compose down -v
 - Grafana
  - 用於視覺化呈現 Prometheus 抓取到的監控數據。
 - Data Generator
- - 自動生成健康資料並每 5 秒寫入到 Elasticsearch 中名為 health_info 的 index。
+ - 自動生成健康資料並定時寫入到 Elasticsearch 中名為 health_info 的 index，並定時查詢 health_info 這個 index。
 - Kibana
  - 用於查詢 Elasticsearch 中 index 的資料，與其他監控指標。
 
