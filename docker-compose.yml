@@ -80,8 +80,13 @@ services:
     container_name: elasticsearch-exporter
     command:
       - '--es.uri=http://elasticsearch1:9200'
-      - '--collector.clustersettings' # post v1.6.0
-      # - '--es.cluster_settings' # pre v1.6.0
+      - '--es.all'
+      - '--es.indices'
+      - '--es.indices_settings'
+      - '--es.indices_mappings'
+      - '--es.shards'
+      - '--collector.clustersettings' # post v1.6.0 (有 watermark 相關 metrics)
+      # - '--es.cluster_settings' # pre v1.6.0 (沒有 watermark 相關 metrics)
     ports:
       - "9114:9114"
     depends_on:
