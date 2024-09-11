@@ -50,17 +50,17 @@ docker-compose down -v
 
 ## container 概述
 - Elasticsearch cluster
- - 包含 elasticsearch1、elasticsearch2、elasticsearch3 三個 node。
+    - 包含 elasticsearch1、elasticsearch2、elasticsearch3 三個 node。
 - Elasticsearch Exporter
- - 提供 Elasticsearch cluster 的監控數據給 Prometheus。
+    - 提供 Elasticsearch cluster 的監控數據給 Prometheus。
 - Prometheus
- - 用於監控系統，從 Elasticsearch Exporter 取得監控數據。
+    - 用於監控系統，從 Elasticsearch Exporter 取得監控數據。
 - Grafana
- - 用於視覺化呈現 Prometheus 抓取到的監控數據。
+    - 用於視覺化呈現 Prometheus 抓取到的監控數據。
 - Data Generator
- - 自動生成健康資料並定時寫入到 Elasticsearch 中名為 health_info 的 index，並定時查詢 health_info 這個 index。
+    - 自動生成健康資料並定時寫入到 Elasticsearch 中名為 health_info 的 index，並定時查詢 health_info 這個 index。
 - Kibana
- - 用於查詢 Elasticsearch 中 index 的資料，與其他監控指標。
+    - 用於查詢 Elasticsearch 中 index 的資料，與其他監控指標。
 
 ## Grafana explore metrics 的使用
 - 入口為 http://localhost:3000/explore/metrics
