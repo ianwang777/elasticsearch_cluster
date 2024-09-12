@@ -43,7 +43,8 @@ def wait_for_elasticsearch():
 wait_for_elasticsearch()
 
 # 每 n 秒生成並寫入一筆健康數據到 elasticsearch
-while True:
+count = 0
+while count < 10000:
     health_data = generate_health_data()
     try:
         response = requests.post(ES_URL, json=health_data)
@@ -53,4 +54,5 @@ while True:
             print("Failed to write data:", response.status_code, response.text)
     except Exception as e:
         print("Error connecting to ElasticSearch:", e)
-    time.sleep(5)
+    time.sleep(5) # 5, 1, 0.01
+    count += 1

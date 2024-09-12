@@ -25,4 +25,4 @@ def search_es():
 # 每秒執行一次
 while True:
     search_es()
-    time.sleep(1)
+    time.sleep(5)
